@@ -1,0 +1,6 @@
+package com.example.linechart_from_json
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity() {
+}
