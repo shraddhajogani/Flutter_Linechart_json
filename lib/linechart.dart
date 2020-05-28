@@ -11,21 +11,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<charts.Series<Speed, String>> seriesBarData;
-
+  List<charts.Series<Speed, int>> seriesBarData;
+// 1. Change it String to int --> get this error: The getter 'time' isn't defined for the type 'List<Speed>'.
   _generateData() async {
     final load =
     await DefaultAssetBundle.of(context).loadString("asset/data.json");
     var decoded = json.decode(load);
-    List<Speed> sales = [];
+    List<Speed> speed = [];
     for (var item in decoded) {
-      sales.add(Speed.fromJson(item));
+      speed.add(Speed.fromJson(item));
     }
 
     seriesBarData.add(charts.Series(
-      data: sales,
-      domainFn: (Speed sales, _) => sales.time,
-      measureFn: (Speed sales, _) => int.parse(sales.distance),
+      data: speed,
+      domainFn: (Speed speed, _) => int.parse(speed.time),
+      // 2.domainFn: (Speed speed, _) => speed.time, (Parse it with int)
+      measureFn: (Speed speed, _) => int.parse(speed.distance),
+      // 3. measureFn: (Speed speed, _) => int.parse(speed.distance), Parse it with int
       id: 'Performance',
     ));
     setState(() {});
@@ -34,7 +36,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    seriesBarData = List<charts.Series<Speed, String>>();
+    seriesBarData = List<charts.Series<Speed, int>>();
+    // 4. Change here String to int
     _generateData();
   }
 
@@ -56,10 +59,21 @@ class _HomePageState extends State<HomePage> {
           ),
           seriesBarData.length > 0
               ? Expanded(
-            child: charts.BarChart(
+            child: charts.LineChart(
               seriesBarData,
               animate: true,
-              animationDuration: Duration(seconds: 5),
+              animationDuration: Duration(seconds: 20),
+              behaviors: [
+
+                new charts.ChartTitle('Time,seconds',
+                behaviorPosition: charts.BehaviorPosition.bottom,
+                  //5. Added Title to Axis
+
+                ),
+            new charts.ChartTitle('Distance,meter',
+            behaviorPosition: charts.BehaviorPosition.start,
+            )
+              ],
             ),
           )
               : Container(),
